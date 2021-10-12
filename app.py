@@ -175,7 +175,3 @@ def searchPdf(current_user):
     tag = Tag.query.filter_by(tag_id=data['tag_id']).all()
     pdf = db.session.query(Pdf_file).filter(Pdf_file.id.in_([e.pdf_id for e in tag]))
     return jsonify({e.id: {"file_name": e.file_name, "file_type": e.file_type, "link": e.link, "description": e.description} for e in pdf})
-
-
-if __name__ == "__main__":
-    app.run(port=5000, debug=True)
