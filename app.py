@@ -1,15 +1,11 @@
-import sqlite3
 from flask import Flask, flash, redirect, request, jsonify, make_response
 from models import *
 from tempfile import mkdtemp
-import os
-import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import jwt
 import datetime
 from functools import wraps
-import token
 from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
@@ -108,9 +104,9 @@ def createPdf(current_user):
     db.session.commit()
     if type(data['tag']) is list:
         # still need tag validation
-        # pdf = Pdf_file.query.filter_by(user_id=current_user.id).filter_by(file_name=data['file_name']).first()
-        # db.session.add_all([Tag(pdf_id=pdf.id, tag_id=e) for e in data['tag']])
-        # db.session.commit()
+        pdf = Pdf_file.query.filter_by(user_id=current_user.id).filter_by(file_name=data['file_name']).first()
+        db.session.add_all([Tag(pdf_id=pdf.id, tag_id=e) for e in data['tag']])
+        db.session.commit()
         pass
     return jsonMessage(f"Add pdf to pdf_files")
 
@@ -157,6 +153,12 @@ def createAdmin(current_user):
 
 
 @app.route("/tag/all")
+@token_required
+def listTag(current_user):
+    return jsonify({e.tag_id: e.tag_name for e in Tag_name.query.all()})
+
+
+@app.route("/search/pdf", methods=['GET', 'POST'])
 @token_required
 def listTag(current_user):
     return jsonify({e.tag_id: e.tag_name for e in Tag_name.query.all()})
