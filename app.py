@@ -1,17 +1,17 @@
-from flask import Flask, flash, redirect, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response
 from models import *
-from tempfile import mkdtemp
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import jwt
 import datetime
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
+import os
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ['DATABASE_URL']
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECRET_KEY'] = "hi-there"  # Temporary
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 db.init_app(app)
 
 with app.app_context():
