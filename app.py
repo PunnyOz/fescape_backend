@@ -47,6 +47,11 @@ def token_required(f):
     return decorator
 
 
+@app.route("/")
+def Hello():
+    return "Hello, world"
+
+
 @app.route("/register", methods=['GET', 'POST'])
 def createUser():
     try:
