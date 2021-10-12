@@ -104,7 +104,7 @@ def createPdf(current_user):
     db.session.commit()
     if type(data['tag']) is list:
         # still need tag validation
-        pdf = Pdf_file.query.filter_by(user_id=current_user.id).filter_by(file_name=data['file_name']).first()
+        pdf = Pdf_file.query.filter_by(user_id=current_user.id, file_name=data['file_name']).first()
         db.session.add_all([Tag(pdf_id=pdf.id, tag_id=e) for e in data['tag']])
         db.session.commit()
         pass
@@ -120,7 +120,7 @@ def createTag(current_user):
         data = request.get_json()
     except:
         return jsonMessage('createPdf unsuccessfully: Invalid JSON')
-    if not data or len(data) != 1:
+    if data is None or len(data) != 1:
         return jsonMessage('createPdf unsuccessfully: Invalid JSON')
     try:
         newTag = Tag_name(tag_name=data['tag_name'])
@@ -158,10 +158,18 @@ def listTag(current_user):
     return jsonify({e.tag_id: e.tag_name for e in Tag_name.query.all()})
 
 
-@app.route("/search/pdf", methods=['GET', 'POST'])
+@app.route("/search/pdf", methods=['GET'])
 @token_required
-def listTag(current_user):
-    return jsonify({e.tag_id: e.tag_name for e in Tag_name.query.all()})
+def searchPdf(current_user):
+    try:
+        data = request.get_json()
+    except:
+        return jsonMessage('searchPdf unsuccessfully: Invalid JSON')
+    if data is None or len(data) != 1:
+        return jsonMessage('searchPdf unsuccessfully: Invalid JSON')
+    tag = Tag.query.filter_by(tag_id=data['tag_id']).all()
+    pdf = db.session.query(Pdf_file).filter(Pdf_file.id.in_([e.pdf_id for e in tag]))
+    return jsonify({e.id: {"file_name": e.file_name, "file_type": e.file_type, "link": e.link, "description": e.description} for e in pdf})
 
 
 if __name__ == "__main__":
