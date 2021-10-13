@@ -37,8 +37,8 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-            current_user = User.query.filter_by(public_id=data['public_id']).first()
-            if current_user is None:
+            current_user = User.query.filter_by(public_id=data['public_id'], password=data['password']).first()
+            if current_user is None or current_user.last_logout > data.exp:
                 return jsonMessage('token is invalid')
         except:
             return jsonMessage('token is invalid')
@@ -58,14 +58,14 @@ def createUser():
         data = request.get_json()
     except:
         return jsonMessage('createUser unsuccessfully: Invalid JSON')
-    if not data or list(data.keys()) != ['username', 'email', 'password']:
+    if not data or list(data.keys()) != ['username', 'password']:
         return jsonMessage('createUser unsuccessfully: Invalid JSON')
 
     if len(data['password']) < 4:
         return jsonMessage('createUser unsuccessfully: Invalid password')
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
-    new_user = User(public_id=str(uuid.uuid4()), user_name=data['username'], email=data['email'], password=hashed_password)
+    new_user = User(public_id=str(uuid.uuid4()), user_name=data['username'], password=hashed_password)
     db.session.add(new_user)
     try:
         db.session.commit()
@@ -84,9 +84,20 @@ def loginUser():
     if user is None:
         return jsonMessage('login unsuccessfully: username or password is incorrect')
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id': user.public_id, 'exp': datetime.datetime.utcnow() +
+        token = jwt.encode({'public_id': user.public_id, 'password': user.password, 'exp': datetime.datetime.utcnow() +
                            datetime.timedelta(minutes=60)}, app.config['SECRET_KEY'])
         return jsonify({'token': token})
+    return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
+
+
+@app.route("/logout", methods=["GET", "POST"])
+@token_required
+def logoutUser(current_user):
+    User.query.filter_by(public_id=current_user.id).first()
+    if User is None:
+        return jsonMessage('Unidentified JWT')
+    User.last_logout = datetime.datetime.utcnow()
+    db.session.commit()
     return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
 
