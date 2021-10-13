@@ -22,7 +22,8 @@ with app.app_context():
 def after_request(response):
     header = response.headers
     header['Access-Control-Allow-Origin'] = '*'
-    header['Access-Control-Allow-Headers'] = "Content-Type, x-access-tokens"
+    header['Access-Control-Allow-Headers'] = "Content-Type, x-access-tokens, Authorization"
+    header['Access-Control-Allow-Credentials'] = "true"
     return response
 
 
