@@ -21,7 +21,7 @@ with app.app_context():
 @app.after_request
 def after_request(response):
     header = response.headers
-    header['Access-Control-Allow-Origin'] = 'https://phumipatc.github.io/running-from-f/'
+    header['Access-Control-Allow-Origin'] = '*'
     header['Access-Control-Allow-Headers'] = "Content-Type, x-access-tokens"
     return response
 
