@@ -97,12 +97,11 @@ def loginUser():
 @app.route("/logout", methods=["GET", "POST"])
 @token_required
 def logoutUser(current_user):
-    if User is None:
+    user = User.query.filter_by(id=current_user.id).first()
+    if user is None:
         return jsonMessage('Unidentified JWT')
-    print(User.query.filter_by(id=current_user.id).first().last_logout)
-    User.last_logout = datetime.datetime.utcnow()
+    user.last_logout = datetime.datetime.utcnow()
     db.session.commit()
-    print(User.query.filter_by(id=current_user.id).first().last_logout)
     return make_response('logout successfully')
 
 
