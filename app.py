@@ -41,8 +41,11 @@ def token_required(f):
             # Signature has expired
             return jsonMessage('token is invalid 0')
         current_user = User.query.filter_by(public_id=data['public_id'], password=data['password']).first()
-        if current_user is None or current_user.last_logout > datetime.datetime.fromtimestamp(data['exp']):
+        if current_user is None:
             return jsonMessage('token is invalid 1')
+        if current_user.last_logout > datetime.datetime.fromtimestamp(data['exp']):
+            current_user = None
+            return jsonMessage('token is expired')
 
         return f(current_user, *args, **kwargs)
     return decorator
