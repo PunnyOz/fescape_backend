@@ -39,9 +39,9 @@ def token_required(f):
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = User.query.filter_by(public_id=data['public_id'], password=data['password']).first()
             if current_user is None or current_user.last_logout > data.exp:
-                return jsonMessage('token is invalid')
+                return jsonMessage('token is invalid 1')
         except:
-            return jsonMessage('token is invalid')
+            return jsonMessage('token is invalid 2')
 
         return f(current_user, *args, **kwargs)
     return decorator
