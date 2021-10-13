@@ -100,6 +100,7 @@ def logoutUser(current_user):
     User.query.filter_by(id=current_user.id).first()
     if User is None:
         return jsonMessage('Unidentified JWT')
+    print(User)
     User.last_logout = datetime.datetime.utcnow()
     db.session.commit()
     return make_response('logout successfully')
