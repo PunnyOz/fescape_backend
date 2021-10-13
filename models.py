@@ -10,7 +10,7 @@ class User(db.Model):
     user_name = db.Column(db.String(20), unique=True, nullable=False)
     # email = db.Column(db.String(60), unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
-    last_logout = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    last_logout = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     admin = db.Column(db.Boolean, default=False)
 
 
