@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, Blueprint
 from models import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
@@ -16,6 +16,14 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+
+@app.after_request
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = 'https://phumipatc.github.io/running-from-f/'
+    header['Access-Control-Allow-Headers'] = "Content-Type, x-access-tokens"
+    return response
 
 
 def jsonMessage(message):
