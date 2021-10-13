@@ -94,12 +94,12 @@ def loginUser():
 @app.route("/logout", methods=["GET", "POST"])
 @token_required
 def logoutUser(current_user):
-    User.query.filter_by(public_id=current_user.id).first()
+    User.query.filter_by(id=current_user.id).first()
     if User is None:
         return jsonMessage('Unidentified JWT')
     User.last_logout = datetime.datetime.utcnow()
     db.session.commit()
-    return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
+    return make_response('logout successfully')
 
 
 @app.route("/pdf/create", methods=['POST'])
@@ -124,11 +124,11 @@ def createPdf(current_user):
         db.session.add_all([Tag(pdf_id=pdf.id, tag_id=e) for e in data['tag']])
         try:
             db.session.commit()
-            return jsonMessage('addTag successfully')
+            return jsonMessage('createPdf successfully and addTag successfully')
         except IntegrityError:
             db.session.rollback()
-            return jsonMessage('addTag unsuccessfully: No tag with that name')
-    return jsonMessage(f"Add pdf to pdf_files")
+            return jsonMessage('createPdf successfully but addTag unsuccessfully: No tag with that name')
+    return jsonMessage(f"createPdf with no tag successfully")
 
 
 @app.route("/admin/tag/create", methods=['POST'])
