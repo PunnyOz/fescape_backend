@@ -120,11 +120,14 @@ def createPdf(current_user):
     db.session.add(newPdf)
     db.session.commit()
     if type(data['tag']) is list:
-        # still need tag validation
         pdf = Pdf_file.query.filter_by(user_id=current_user.id, file_name=data['file_name']).first()
         db.session.add_all([Tag(pdf_id=pdf.id, tag_id=e) for e in data['tag']])
-        db.session.commit()
-        pass
+        try:
+            db.session.commit()
+            return jsonMessage('addTag successfully')
+        except IntegrityError:
+            db.session.rollback()
+            return jsonMessage('addTag unsuccessfully: No tag with that name')
     return jsonMessage(f"Add pdf to pdf_files")
 
 
