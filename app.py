@@ -190,7 +190,7 @@ def listTag(current_user):
     return jsonify({e.tag_id: e.tag_name for e in Tag_name.query.all()})
 
 
-@app.route("/search/pdf", methods=['GET'])
+@app.route("/search/pdf", methods=["GET", "POST"])
 @token_required
 def searchPdf(current_user):
     try:
