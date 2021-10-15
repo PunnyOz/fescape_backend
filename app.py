@@ -85,7 +85,7 @@ def createUser():
         return jsonMessage('createUser successfully')
     except IntegrityError:
         db.session.rollback()
-        return jsonMessage('createUser unsuccessfully: Username or email is already taken')
+        return jsonMessage('createUser unsuccessfully: Username is already taken')
 
 
 @app.route("/login", methods=["GET", "POST"])
